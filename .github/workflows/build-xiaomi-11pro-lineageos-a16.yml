@@ -109,6 +109,14 @@ jobs:
           restore-keys: |
             ccache-${{ runner.os }}-
 
+      - name: 💾 Restore clang toolchain
+        uses: actions/cache@v4
+        with:
+          path: clang-custom
+          key: clang-${{ runner.os }}-${{ env.CLANG_BRANCH }}
+          restore-keys: |
+            clang-${{ runner.os }}-
+
       - name: ⌛️ Compilation environment preparation
         uses: ./.github/workflows/build-env
 
