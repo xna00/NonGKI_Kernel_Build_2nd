@@ -137,5 +137,22 @@ jobs:
       - name: 🔩 Pack Process
         uses: ./.github/workflows/pack-process
 
+      - name: 🗂️ Collect DTBO/DTB files
+        shell: bash
+        run: |
+          DTS=$GITHUB_WORKSPACE/device_kernel/out/arch/arm64/boot/dts/vendor/qcom
+          mkdir -p /tmp/dtfiles
+          cp -f $DTS/lahaina.dtb /tmp/dtfiles/ 2>/dev/null || echo "MISS lahaina.dtb"
+          cp -f $DTS/mars-sm8350-overlay.dtbo /tmp/dtfiles/ 2>/dev/null || echo "MISS mars dtbo"
+          cp -f $DTS/star-sm8350-overlay.dtbo /tmp/dtfiles/ 2>/dev/null || echo "MISS star dtbo"
+          cp -f $DTS/venus-sm8350-overlay.dtbo /tmp/dtfiles/ 2>/dev/null || echo "MISS venus dtbo"
+          ls -la /tmp/dtfiles/
+
+      - name: 📤 Upload DTBO/DTB files
+        uses: actions/upload-artifact@v7
+        with:
+          name: mars-dt-files
+          path: /tmp/dtfiles/
+
       - name: ✏️ Upload Artifacts
         uses: ./.github/workflows/upload-files
