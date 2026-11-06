@@ -507,7 +507,7 @@ runs:
             echo "::group::[+] Getting Clang..."
 
             if [[ "${{ env.CLANG_SOURCE }}" == *".git" ]]; then
-                git clone "${{ env.CLANG_SOURCE }}" -b "${{ env.CLANG_BRANCH }}" clang-custom --depth=1
+                if [ ! -d clang-custom ]; then git clone "${{ env.CLANG_SOURCE }}" -b "${{ env.CLANG_BRANCH }}" clang-custom --depth=1; else echo "[+] clang-custom cached, skipping clone"; fi
 
             elif [[ "${{ env.CLANG_SOURCE }}" == *'.tar.gz' ]]; then
                 ${{ env.CURLX }} "${{ env.CLANG_SOURCE }}" clang.tar.gz
@@ -532,7 +532,7 @@ runs:
                 bash antman -S=10032024
 
             elif [[ "${{ env.CLANG_SOURCE }}" == *"android.googlesource.com"* ]]; then
-                git clone "${{ env.CLANG_SOURCE }}" -b "${{ env.CLANG_BRANCH }}" clang-custom --depth=1
+                if [ ! -d clang-custom ]; then git clone "${{ env.CLANG_SOURCE }}" -b "${{ env.CLANG_BRANCH }}" clang-custom --depth=1; else echo "[+] clang-custom cached, skipping clone"; fi
                 SUBDIR=$(find clang-custom -maxdepth 1 -type d -name 'clang-r*' | head -n 1)
 
                 if [ -n "$SUBDIR" ]; then
