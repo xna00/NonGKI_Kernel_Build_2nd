@@ -101,6 +101,14 @@ jobs:
       - name: ⏰ Checkout repository
         uses: actions/checkout@v6
 
+      - name: 💾 Restore ccache
+        uses: actions/cache@v4
+        with:
+          path: ~/.ccache
+          key: ccache-${{ runner.os }}-${{ env.KERNEL_BRANCH }}-${{ env.SUSFS_ENABLE }}-${{ env.MERGE_CONFIG_FILES }}
+          restore-keys: |
+            ccache-${{ runner.os }}-
+
       - name: ⌛️ Compilation environment preparation
         uses: ./.github/workflows/build-env
 
