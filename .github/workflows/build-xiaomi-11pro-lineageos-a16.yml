@@ -105,7 +105,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.ccache
-          key: ccache-${{ runner.os }}-${{ env.KERNEL_BRANCH }}-${{ env.SUSFS_ENABLE }}-${{ env.MERGE_CONFIG_FILES }}
+          key: ccache-${{ runner.os }}-${{ env.KERNEL_BRANCH }}-${{ env.SUSFS_ENABLE }}
           restore-keys: |
             ccache-${{ runner.os }}-
 
