@@ -277,11 +277,15 @@ runs:
             echo "::endgroup::"
             echo "[+] The base packages is installed."
 
-            # Install Coccinelle
-            echo "::group::[+] Starting build coccinelle..."
-            sudo apt-get install coccinelle -y
-            echo "::endgroup::"
-            echo "[+] Coccinelle is installed."
+            # Install Coccinelle (only needed for Droidspaces)
+            if [[ "${{ env.DROIDSPACES_ENABLE }}" == "true" ]]; then
+                echo "::group::[+] Starting build coccinelle..."
+                sudo apt-get install coccinelle -y
+                echo "::endgroup::"
+                echo "[+] Coccinelle is installed."
+            else
+                echo "[-] DROIDSPACES disabled, skipping coccinelle."
+            fi
 
             # Install Libtinfo5
             ${{ env.CURLX }} https://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2_amd64.deb libtinfo5.deb
