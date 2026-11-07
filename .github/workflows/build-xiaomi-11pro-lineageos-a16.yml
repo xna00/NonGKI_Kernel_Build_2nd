@@ -127,6 +127,7 @@ jobs:
         uses: ./.github/workflows/patch-susfs
 
       - name: 🔗 Patch for no-kprobe
+        if: env.KERNELSU_AUTO_GET == 'true' || env.KERNELSU_SOURCE != ''
         uses: ./.github/workflows/patch-no-kprobe
 
       - name: 🪛 Extra Kernel Options
