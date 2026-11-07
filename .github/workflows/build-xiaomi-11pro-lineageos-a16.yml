@@ -41,7 +41,7 @@ env:
   KERNELSU_SOURCE : ""
   KERNELSU_BRANCH : ""
 
-  KERNELSU_AUTO_GET : "false"
+  KERNELSU_AUTO_GET : "true"
   KERNELSU_AUTO_FORK : "bakasu" # xxksu, rsuntk , next, bakasu and sukisu
 
   SUSFS_ENABLE : false
