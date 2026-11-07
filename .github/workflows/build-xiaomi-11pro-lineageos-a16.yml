@@ -17,6 +17,10 @@ env:
 
   CLANG_SOURCE : "https://github.com/bluegreensea/android_prebuilts_clang_kernel_linux-x86_clang-r563880c.git"
   CLANG_BRANCH : "main"
+  # Must match the prebuilt exactly; also used to scope caches so an old
+  # toolchain can never be restored through restore-keys fallback.
+  CLANG_TAG : "r563880c"
+  CLANG_VER : "21.0.0"
 
   GCC_GNU : false
   GCC_64_SOURCE : "https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9.git"
@@ -105,17 +109,31 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.ccache
-          key: ccache-${{ runner.os }}-${{ env.KERNEL_BRANCH }}-${{ env.SUSFS_ENABLE }}
+          key: ccache-${{ runner.os }}-${{ env.KERNEL_BRANCH }}-${{ env.SUSFS_ENABLE }}-${{ env.CLANG_TAG }}
           restore-keys: |
-            ccache-${{ runner.os }}-
+            ccache-${{ runner.os }}-${{ env.KERNEL_BRANCH }}-${{ env.SUSFS_ENABLE }}-${{ env.CLANG_TAG }}
 
       - name: 💾 Restore clang toolchain
         uses: actions/cache@v4
         with:
           path: clang-custom
-          key: clang-${{ runner.os }}-${{ env.CLANG_BRANCH }}
+          key: clang-${{ runner.os }}-${{ env.CLANG_TAG }}
           restore-keys: |
-            clang-${{ runner.os }}-
+            clang-${{ runner.os }}-${{ env.CLANG_TAG }}
+
+      - name: ✅ Verify clang toolchain
+        shell: bash
+        run: |
+          if [ -d clang-custom ]; then
+            echo "[+] clang-custom restored from cache, version info:"
+            cat clang-custom/AndroidVersion.txt 2>/dev/null | head -3 || true
+            if ! grep -q "${{ env.CLANG_VER }}" clang-custom/AndroidVersion.txt 2>/dev/null; then
+              echo "[-] Cached clang is not the expected toolchain (${{ env.CLANG_VER }}), removing it."
+              rm -rf clang-custom
+            fi
+          else
+            echo "[+] No cached clang, will be cloned by build-env."
+          fi
 
       - name: ⌛️ Compilation environment preparation
         uses: ./.github/workflows/build-env
