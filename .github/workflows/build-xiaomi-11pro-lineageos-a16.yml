@@ -9,7 +9,10 @@ env:
   DEVICE_NAME : "xiaomi_11pro"
   DEVICE_CODENAME : "mars"
 
-  CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu-"
+  # Match LineageOS build.config.common (LLVM=1): makes NM/OBJCOPY/AR/STRIP
+  # come from llvm. Without this they fall back to the ancient Android GCC 4.9
+  # binutils, which also disables CONFIG_RELR and can corrupt the Image.
+  CUSTOM_CMDS : "LLVM=1 LLVM_IAS=1 CLANG_TRIPLE=aarch64-linux-gnu-"
   EXTRA_CMDS : "LD=ld.lld"
 
   KERNEL_SOURCE : "https://github.com/LineageOS/android_kernel_xiaomi_sm8350.git"
@@ -23,9 +26,11 @@ env:
   CLANG_VER : "21.0.0"
 
   GCC_GNU : false
-  GCC_64_SOURCE : "https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9.git"
+  # No GNU GCC: LLVM=1 supplies every tool, and with no CROSS_COMPILE the
+  # kernel picks the standard aarch64-linux-gnu target (same as LineageOS).
+  GCC_64_SOURCE : ""
   GCC_64_BRANCH : "android12L-release"
-  GCC_32_SOURCE : "https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9.git"
+  GCC_32_SOURCE : ""
   GCC_32_BRANCH : "android12L-release"
 
   DEFCONFIG_SOURCE: ""
@@ -168,6 +173,14 @@ jobs:
 
       - name: 🚀 Build Process
         uses: ./.github/workflows/build-process
+
+      - name: 📤 Upload build metadata
+        uses: actions/upload-artifact@v7
+        with:
+          name: mars-build-meta
+          path: |
+            device_kernel/out/System.map
+            device_kernel/out/.config
 
       - name: 🔩 Pack Process
         uses: ./.github/workflows/pack-process
