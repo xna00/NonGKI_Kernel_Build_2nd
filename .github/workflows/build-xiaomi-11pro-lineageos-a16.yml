@@ -157,7 +157,12 @@ jobs:
         run: |
           # Only ${{ env.DEVICE_NAME }} use it.
           cd $GITHUB_WORKSPACE/device_kernel
-          # Nothing
+          # KernelSU patch steps leave the tree dirty, so setlocalversion
+          # appends "-dirty" -> vermagic becomes 5.4.302-qgki-...-dirty and
+          # every stock vendor module refuses to load. Keep the release
+          # string byte-identical to the stock kernel.
+          sed -i "s/printf '%s' -dirty/:/" scripts/setlocalversion
+          grep -n "dirty" scripts/setlocalversion || true
 
       - name: 🧰 Patch Kernel of Re:Kernel
         uses: ./.github/workflows/patch-rekernel
